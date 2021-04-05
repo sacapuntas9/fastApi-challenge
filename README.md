@@ -29,7 +29,7 @@
   <h3 align="center">FastApi Data Interface Demonstration</h3>
 
   <p align="center">
-    Easily testable and deployable locally and in the cloud.
+    Showcases many FastApi features and good coding practices.
     <br />
     <a href="https://github.com/othneildrew/Best-README-Template">How to Run</a>
     ·

@@ -14,14 +14,18 @@ from fast_api_challenge.database import base
 
 base.Base.metadata.create_all(bind=base.engine)  # Create table schema in db if not exists
 
-app = FastAPI()
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 version = open("VERSION", "r")
 VERSION = version.readline()  # Used for metadata info
 version.close()
+
+app = FastAPI(
+    title="FastApi Data Interface Demonstration",
+    description="Showcases many FastApi features and good coding practices.",
+    version=version,)
 APPLICATION_START_TIME = datetime.utcnow()  # Used for metadata info
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_db():
@@ -34,6 +38,10 @@ def get_db():
 
 @app.post("/show/", response_model=models.NetflixShowModel, status_code=201)
 def create_show(show: models.NetflixShowModel, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    """
+    Create a new show in the database. Throws an error if a show with the given show_id already exists, and generates
+    a new show_id if one is not specified.
+    """
     if show.show_id and database_interface.get_netflix_show(db, show_id=show.show_id):
         raise HTTPException(status_code=400, detail="Show already exists with given show_id.")
     return database_interface.create_netflix_show(db, show=show)
@@ -41,6 +49,9 @@ def create_show(show: models.NetflixShowModel, db: Session = Depends(get_db), to
 
 @app.get("/show/{show_id}", response_model=models.NetflixShowModel)
 def get_show(show_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    """
+    Retrieve a show from the database with the given show_id, if one exists.
+    """
     show = database_interface.get_netflix_show(db, show_id=show_id)
     if show is None:
         raise HTTPException(status_code=404, detail="Show not found.")
@@ -57,7 +68,9 @@ def get_shows(
               db: Session = Depends(get_db),
               token: str = Depends(oauth2_scheme)):
     """
-    Search shows, based on query parameters
+    Search for shows, based on query parameters. Includes the ability to paginate using skip and limit, the ability to
+    sort using sort and orderBy, and the ability to filter based on any database field with a parameter identical to
+    each field name.
     """
     if sort and not orderBy:
         raise HTTPException(status_code=400, detail="Cannot use the sort parameter without the orderBy parameter.")
@@ -67,20 +80,30 @@ def get_shows(
 
 @app.put("/show/{show_id}", response_model=models.NetflixShowModel)
 def update_show(show: models.NetflixShowUpdateModel, show_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    """
+    Update the show with the given show_id using the fields in the request. Throws an error if the show_id does not
+    exist.
+    """
     if not database_interface.get_netflix_show(db, show_id=show_id):
-        raise HTTPException(status_code=400, detail="Show not found.")
+        raise HTTPException(status_code=404, detail="Show not found.")
     return database_interface.update_netflix_show(db, show=show, show_id=show_id)
 
 
 @app.delete("/show/{show_id}")
 def delete_show(show_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    """
+    Remove the show with the given show_id from the databse, if one exists.
+    """
     if not database_interface.get_netflix_show(db, show_id=show_id):
-        raise HTTPException(status_code=400, detail="Show not found.")
+        raise HTTPException(status_code=404, detail="Show not found.")
     return database_interface.delete_netflix_show(db, show_id=show_id)
 
 
 @app.post("/token", response_model=api_models.Token)
 async def retrieve_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    """
+    Retrieve an Auth token
+    """
     token_request = api_models.TokenRequestModel(name=form_data.username)
     authenticated = authenticate_api_user(token_request)
     if not authenticated:
@@ -98,6 +121,10 @@ async def retrieve_access_token(form_data: OAuth2PasswordRequestForm = Depends()
 
 @app.get("/summary", response_model=api_models.SummaryResponseModel)
 def get_summary(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    """
+    Retrieve aggregated summary metadata about the stored data, including number of shows, number of unique shows,
+    number of directors, etc., along with Api information such as the current Version.
+    """
     response = api_models.SummaryResponseModel(number_of_shows=database_interface.get_number_netflix_shows(db_session=db),
                                                number_of_unique_shows=database_interface.get_number_of_unique_for_given_netflix_show_table_column(db_session=db, column_name=None),
                                                number_of_unique_titles=database_interface.get_number_of_unique_for_given_netflix_show_table_column(db_session=db, column_name="title"),

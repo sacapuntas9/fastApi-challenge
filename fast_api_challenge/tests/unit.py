@@ -14,8 +14,6 @@ from fast_api_challenge.models import database_models
 from fast_api_challenge.database import orm
 
 
-# TODO: Write a test for the Search method if there's time
-
 class TestDatabaseInterface(unittest.TestCase):
     """
     Tests the database interface module methods using an in-memory database

@@ -7,7 +7,7 @@ db = os.getenv("POSTGRES_DB", "app")
 
 # Unix socket connection configuration for google cloud
 db_socket_dir = os.environ.get("DB_SOCKET_DIR", "/cloudsql")
-cloud_sql_connection_name = os.environ["CLOUD_SQL_CONNECTION_NAME"]
+cloud_sql_connection_name = os.environ.get("CLOUD_SQL_CONNECTION_NAME", None)
 
 if user and password and server and db:
     SQLALCHEMY_DATABASE_URL = f"postgresql://{user}:{password}@{server}/{db}"

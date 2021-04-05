@@ -94,7 +94,6 @@ def search_netflix_show(db_session: Session,
     if skip:
         db_query = db_query.offset(skip)
 
-
     return db_query.all()  # Execute the dynamically generated, chained, filter expression
 
 
