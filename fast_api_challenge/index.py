@@ -19,10 +19,11 @@ version = open("VERSION", "r")
 VERSION = version.readline()  # Used for metadata info
 version.close()
 
+
 app = FastAPI(
     title="FastApi Data Interface Demonstration",
     description="Showcases many FastApi features and good coding practices.",
-    version=version,)
+    version=VERSION,)
 APPLICATION_START_TIME = datetime.utcnow()  # Used for metadata info
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
