@@ -81,7 +81,7 @@ database migrations.
 * Elegant code organization facilitated by FastApi's framework and its ability to utilize Pydantic Models.
 * Easy deployment and validation via Docker, allowing CI tools like Cloud Build to automatically build images from code
 committed to Github.
-* Authentication implemented, with a token issuer endpoint, (`/token`), and a clear demonstration of the OAuth2 and 
+* Authentication implemented, with a token issuer endpoint (`/token`), and a clear demonstration of the OAuth2 and 
 JWT Bearer token Authentication method. Note that Authorization could also be implemented using token scopes.
 * Robust testing of the Api logical layer, demonstrating good code organization principles by utilizing modularized
 code that can be atomically tested.
@@ -114,11 +114,11 @@ and `/redoc` respectively.
 
 The following environment variables must be set to run locally:
 
-* sqlalchemy_database_url (Can use SQLite)
+* `sqlalchemy_database_url` (Can use SQLite)
 
-* auth_issuer_secret_key (Used to sign the JWT Authentication token certificates)
+* `auth_issuer_secret_key` (Used to sign the JWT Authentication token certificates)
 
-* auth_issuer_valid_username (Username to accept which is allowed to generate a JWT token)
+* `auth_issuer_valid_username` (Username to accept which is allowed to generate a JWT token)
 
 ### Run in the Cloud
 
@@ -127,21 +127,21 @@ The following environment variables must be set to run locally:
 
 The following environment variables must be set to run via Docker:
 
-* auth_issuer_secret_key (Used to sign the JWT Authentication token certificates)
+* `auth_issuer_secret_key` (Used to sign the JWT Authentication token certificates)
 
-* auth_issuer_valid_username (Username to accept which is allowed to generate a JWT token)
+* `auth_issuer_valid_username` (Username to accept which is allowed to generate a JWT token)
 
-* POSTGRES_USER 
+* `POSTGRES_USER`
 
-* POSTGRES_PASSWORD
+* `POSTGRES_PASSWORD`
 
-* POSTGRES_SERVER
+* `POSTGRES_SERVER`
 
-* POSTGRES_DB
+* `POSTGRES_DB`
 
-* DB_SOCKET_DIR (Only required if using Linux Sockets to connect to the DB. Defaults to `/cloudsql`)
+* `DB_SOCKET_DIR` (Only required if using Linux Sockets to connect to the DB. Defaults to `/cloudsql`)
 
-* CLOUD_SQL_CONNECTION_NAME (Only required if using Linux Sockets to connect to the DB.)
+* `CLOUD_SQL_CONNECTION_NAME` (Only required if using Linux Sockets to connect to the DB.)
 
 
 Note: There are, of course, many other ways to run this application in production besides Docker.
