@@ -2,6 +2,7 @@ import sys, os
 sys.path
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]), '../..'))  # Reference the root of the project like api does
 
+import math
 from typing import List
 import unittest
 from hypothesis import given, strategies as st
@@ -84,6 +85,32 @@ class TestDatabaseInterface(unittest.TestCase):
             update_result = database_interface.update_netflix_show(db_session=db, show=db_update_model, show_id=show_id)
             self.assertIsNotNone(update_result)
             self.assertTrue(isinstance(update_result, database_models.NetflixShowUpdateModel))
+
+    @given(model_instances=st.lists(st.builds(database_models.NetflixShowModel), min_size=11))
+    @inject_in_memory_db_with_netflix_show_table
+    def test_search_netflix_shows(self, model_instances: List[database_models.NetflixShowModel], db):
+        """
+        Tests database method which searches for a show based on filter parameters, with ordering and pagination.
+        This could be alternatively split into multiple tests based on each configurable aspect of Search.
+        """
+        for db_model in model_instances:  # Add all instances to db
+            database_interface.create_netflix_show(db_session=db, show=db_model)
+
+        # Test Pagination
+        for i in range(0, math.floor(len(model_instances)/10)):  # Uses page size of 10 - this could be randomized
+            current_page = database_interface.search_netflix_show(db_session=db,
+                                                                  filter_args=database_models.NetflixShowSearchModel(),
+                                                                  skip=i*10,
+                                                                  limit=10,
+                                                                  )
+            self.assertEqual(10, len(current_page))
+
+        final_page = database_interface.search_netflix_show(db_session=db,
+                                                            filter_args=database_models.NetflixShowSearchModel(),
+                                                            skip=math.floor(len(model_instances)/10) * 10,
+                                                            limit=10
+                                                            )
+        self.assertEqual(len(model_instances) % 10, len(final_page))
 
     @given(model_instances=st.lists(st.builds(database_models.NetflixShowModel)))
     @inject_in_memory_db_with_netflix_show_table
