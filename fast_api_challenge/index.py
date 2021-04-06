@@ -22,11 +22,23 @@ version.close()
 
 app = FastAPI(
     title="FastApi Data Interface Demonstration",
-    description="Showcases many FastApi features and good coding practices.",
+    description="Showcases many FastApi features and good coding practices by exposing the Netflix Movies and TV Shows "
+                "database via a RESTful Api, along with a Search feature.",
     version=VERSION,)
 APPLICATION_START_TIME = datetime.utcnow()  # Used for metadata info
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+tags_metadata = [
+    {
+        "name": "REST Api",
+        "description": "RESTful data operations, along with Search."
+    },
+    {
+        "name": "Auth",
+        "description": "Authentication related endpoints."
+    },
+]
 
 
 def get_db():
@@ -37,7 +49,7 @@ def get_db():
         db.close()
 
 
-@app.post("/show/", response_model=models.NetflixShowModel, status_code=201)
+@app.post("/show/", response_model=models.NetflixShowModel, status_code=201, tags=["REST Api"])
 def create_show(show: models.NetflixShowModel, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     """
     Create a new show in the database. Throws an error if a show with the given show_id already exists, and generates
@@ -48,7 +60,7 @@ def create_show(show: models.NetflixShowModel, db: Session = Depends(get_db), to
     return database_interface.create_netflix_show(db, show=show)
 
 
-@app.get("/show/{show_id}", response_model=models.NetflixShowModel)
+@app.get("/show/{show_id}", response_model=models.NetflixShowModel, tags=["REST Api"])
 def get_show(show_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     """
     Retrieve a show from the database with the given show_id, if one exists.
@@ -59,7 +71,7 @@ def get_show(show_id: int, db: Session = Depends(get_db), token: str = Depends(o
     return show
 
 
-@app.get("/shows", response_model=List[models.NetflixShowModel])
+@app.get("/shows", response_model=List[models.NetflixShowModel], tags=["REST Api"])
 def get_shows(
               filter_args: models.NetflixShowSearchModel=Depends(),
               skip: Optional[int] = Query(None, ge=0),
@@ -79,7 +91,7 @@ def get_shows(
                                                   sort=sort)
 
 
-@app.put("/show/{show_id}", response_model=models.NetflixShowModel)
+@app.put("/show/{show_id}", response_model=models.NetflixShowModel, tags=["REST Api"])
 def update_show(show: models.NetflixShowUpdateModel, show_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     """
     Update the show with the given show_id using the fields in the request. Throws an error if the show_id does not
@@ -90,7 +102,7 @@ def update_show(show: models.NetflixShowUpdateModel, show_id: int, db: Session =
     return database_interface.update_netflix_show(db, show=show, show_id=show_id)
 
 
-@app.delete("/show/{show_id}")
+@app.delete("/show/{show_id}", tags=["REST Api"])
 def delete_show(show_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     """
     Remove the show with the given show_id from the databse, if one exists.
@@ -100,7 +112,7 @@ def delete_show(show_id: int, db: Session = Depends(get_db), token: str = Depend
     return database_interface.delete_netflix_show(db, show_id=show_id)
 
 
-@app.post("/token", response_model=api_models.Token)
+@app.post("/token", response_model=api_models.Token, tags=["Auth"])
 async def retrieve_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     Retrieve an Auth token
@@ -120,7 +132,7 @@ async def retrieve_access_token(form_data: OAuth2PasswordRequestForm = Depends()
     return access_token
 
 
-@app.get("/summary", response_model=api_models.SummaryResponseModel)
+@app.get("/summary", response_model=api_models.SummaryResponseModel, tags=["REST Api"])
 def get_summary(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     """
     Retrieve aggregated summary metadata about the stored data, including number of shows, number of unique shows,
