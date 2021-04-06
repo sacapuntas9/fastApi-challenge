@@ -38,5 +38,3 @@ class NetflixShowSearchModel(NetflixShowModel):
     2) Only contains fields which should be used to search
     """
     title: str = None
-
-# TODO: Set up actual Api with various REST calls (graphql too?). Add documentation. Add tests.
