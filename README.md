@@ -31,7 +31,7 @@
   <p align="center">
     Showcases many FastApi features and good coding practices.
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">How to Run</a>
+    <a href="#getting-started">How to Run</a>
     ·
     <a href="https://github.com/othneildrew/Best-README-Template/issues">Report Bug</a>
     ·
