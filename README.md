@@ -156,6 +156,8 @@ Note: There are, of course, many other ways to run this application in productio
 
 * GraphQL Search
 
+* Api Integration Tests using Hypothesis for data generation (similarly to the Unit tests) and `httpx` to run the emulated server 
+
 
 
 
